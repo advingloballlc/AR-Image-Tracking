@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" />
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.min.js"></script>
+
+  <style>
+    #example-scanning-overlay {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background: transparent;
+      z-index: 2;
+    }
+
+    #example-scanning-overlay.hidden {
+      display: none;
+    }
+
+    .inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background-repeat: no-repeat;
+      background-size: 50px 50px;
+    }
+
+    .previwe-img {
+      border-radius: 10px;
+      opacity: 0.5;
+      width: 300px;
+    }
+  </style>
+</head>
+<body>
+  <div id="example-scanning-overlay" class="hidden">
+    <div class="inner">
+      <img class="previwe-img" src="./data/img/Target_Img.jpeg">
+    </div>
+  </div>
+  <a-scene
+    mindar-image="uiScanning: #example-scanning-overlay; imageTargetSrc: ./data/AR/targets.mind; filterMinCF:0.001; filterBeta: 10; missTolerance: 1"
+    color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false">
+    <a-assets>
+      <!-- <audio id="river" src="./data/audio/Podorozhko_audio_15.mp3" preload="auto"></audio> -->
+      <a-asset-item id="avatarModel" src="./data/models/vancuver_size_five.gltf"></a-asset-item>
+    </a-assets>
+
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+    <a-entity id="gepargin-target" mindar-image-target="targetIndex: 0">
+      <a-entity id="target" look-at-camera>
+        <a-entity id="avatar" rotation="90 0 0 " position="0 -0.1 0.1" scale="1 1 1" gltf-model="#avatarModel"></a-entity>
+      </a-entity>
+    </a-entity>
+    </a-entity>
+  </a-scene>
+  <script>
+    const geparginTarget = document.querySelector("#gepargin-target");
+    let audioElement
+    let avatarModel;
+    document.addEventListener("DOMContentLoaded", function () {
+      addAudioEntity();
+      const avatar = document.querySelector("#avatar");    
+      const entity = document.querySelector('[sound]'); 
+
+      avatar.addEventListener("model-loaded", (event) => {
+        console.log("loaded!");
+      });
+        // animation="property: position; to: 0 0.1 0.1; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate"  animation-mixer="timeScale: 0.7"
+      // TARGET FOUND
+      geparginTarget.addEventListener("targetFound", (event) => {
+        // entity.components.sound.playSound();
+        avatar.setAttribute('animation-mixer', {});
+      });
+
+      // TARGET LOST
+      geparginTarget.addEventListener("targetLost", (event) => {
+        // entity.components.sound.stopSound();
+        avatar.removeAttribute('animation-mixer');
+      });
+      function addAudioEntity() {
+      var scene = document.querySelector('a-scene');
+
+      var audioEntity = document.createElement('a-entity');
+      audioEntity.setAttribute('sound', 'src: #river; volume: 1; loop: true');
+      scene.appendChild(audioEntity);
+    }
+    });
+
+    // AFRAME.registerComponent('look-at-camera', {
+    //   tick: function () {
+    //     let camera = document.querySelector('[camera]');
+    //     let cameraPosition = camera.getAttribute('position');
+    //     let entityPosition = this.el.getAttribute('position');
+    //     let lookAtVector = new THREE.Vector3().subVectors(cameraPosition, entityPosition);
+    //     this.el.object3D.lookAt(entityPosition.clone().add(lookAtVector));
+    //   }
+    // });
+  </script>
+</body>
+</html>
